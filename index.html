@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+
+  <!--
+    VIEWPORT MOBILE-FIRST
+    Garante que o site ocupe toda a tela do celular
+    sem zoom automático indesejado.
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Impede que o telefone tente ligar para números na tela -->
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Aparência ao adicionar à tela inicial do celular -->
+  <meta name="theme-color" content="#6B1A2A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- SEO básico -->
+  <meta name="description" content="Buenos Frios — Empório gourmet de queijos, frios, vinhos, antepastos e tábuas. Fazendo parte dos seus melhores momentos." />
+
+  <title>Buenos Frios — Fazendo parte dos seus melhores momentos</title>
+
+  <!--
+    FONTES
+    Playfair Display → títulos e destaques (sofisticado, editorial)
+    Inter           → corpo, preços e textos de interface (legível, neutro)
+    Carregamos apenas os pesos que vamos usar para economizar dados.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Folha de estilos principal -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ============================================================
+    CABEÇALHO FIXO
+    Permanece visível enquanto o usuário rola a página.
+    Contém: logo, busca e ícone do carrinho.
+  ============================================================ -->
+  <header class="header" id="header">
+    <div class="header__inner">
+
+      <!-- Logo da Buenos Frios -->
+      <a href="/" class="header__logo" aria-label="Buenos Frios — Início"
+         onclick="navegarPara('/'); return false;">
+        <span class="logo__mark" aria-hidden="true">🧀</span>
+        <span class="logo__wordmark">
+          <span class="logo__nome">Buenos <em>Frios</em></span>
+          <span class="logo__tagline">Empório Gourmet</span>
+        </span>
+      </a>
+
+      <!-- Barra de busca -->
+      <div class="header__search">
+        <input
+          type="search"
+          id="campoBusca"
+          class="search__input"
+          placeholder="Buscar queijos, vinhos, tábuas..."
+          aria-label="Buscar produtos"
+          autocomplete="off"
+        />
+        <button class="search__btn" aria-label="Pesquisar">
+          <!-- Ícone de lupa em SVG (sem dependência externa) -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Botão do carrinho (topo, visível em desktop) -->
+      <button class="header__cart-btn" id="btnCarrinhoTopo" aria-label="Abrir carrinho">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <!-- Badge com quantidade de itens -->
+        <span class="cart-badge" id="cartBadgeTopo">0</span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ============================================================
+    ÁREA PRINCIPAL
+    Todo o conteúdo dinâmico é injetado aqui pelo JavaScript.
+    Cada "página" do catálogo substitui o conteúdo desta div.
+  ============================================================ -->
+  <main class="main" id="appMain">
+
+    <!--
+      TELA DE CARREGAMENTO INICIAL
+      Exibida enquanto o app verifica a conexão com a planilha.
+      O JavaScript remove esta tela depois que os dados chegam.
+    -->
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loading-screen__inner">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p class="loading-screen__text">Carregando catálogo…</p>
+      </div>
+    </div>
+
+    <!--
+      TELA DE ERRO DE CONEXÃO
+      Exibida se não for possível conectar ao Google Apps Script.
+      Inicialmente oculta; o JavaScript a mostra se necessário.
+    -->
+    <div class="error-screen hidden" id="errorScreen">
+      <div class="error-screen__inner">
+        <span class="error-screen__icon" aria-hidden="true">⚠️</span>
+        <h2 class="error-screen__title">Não foi possível carregar o catálogo</h2>
+        <p class="error-screen__desc" id="errorDesc">
+          Verifique sua conexão e tente novamente.
+        </p>
+        <button class="btn btn--primary" id="btnTentarNovamente">
+          Tentar novamente
+        </button>
+      </div>
+    </div>
+
+    <!--
+      CONTEÚDO DINÂMICO
+      Inicialmente vazio. O JavaScript injeta aqui:
+      — Home com categorias
+      — Lista de produtos
+      — Página de produto
+      — Resultados de busca
+      — etc.
+    -->
+    <div class="app-content hidden" id="appContent"></div>
+
+  </main>
+
+  <!-- ============================================================
+    CARRINHO FLUTUANTE (RODAPÉ — MOBILE)
+    Sempre visível na parte inferior da tela no celular.
+    Em desktop aparece de forma discreta no canto inferior direito.
+    Inicialmente oculto; aparece quando o primeiro item é adicionado.
+  ============================================================ -->
+  <div class="cart-bar" id="cartBar" role="complementary" aria-label="Carrinho">
+    <div class="cart-bar__inner">
+
+      <!-- Resumo rápido -->
+      <div class="cart-bar__info">
+        <span class="cart-bar__count">
+          <strong id="cartItemCount">0</strong> itens
+        </span>
+        <span class="cart-bar__divider" aria-hidden="true">·</span>
+        <span class="cart-bar__total" id="cartTotal">R$ 0,00</span>
+      </div>
+
+      <!-- Botão de finalizar -->
+      <button class="btn btn--gold cart-bar__btn" id="btnFinalizarPedido">
+        Finalizar pedido
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+    SCRIPTS
+    Carregados no final do <body> para não travar a renderização.
+    A ordem importa: utils → api → catalogo → produto → carrinho → checkout → app
+  ============================================================ -->
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/pageRenderer.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/app.js"></script>
+
+  <!--
+    NOTA PARA O DESENVOLVEDOR:
+    Os demais módulos (catalogo.js, produto.js, carrinho.js, checkout.js)
+    serão adicionados nas próximas fases do projeto.
+    Por enquanto apenas utils.js, api.js e app.js são carregados.
+  -->
+
+</body>
+</html>
