@@ -43,7 +43,7 @@ var API = {
    *
    * Formato: 'https://script.google.com/macros/s/XXXXXXXX/exec'
    */
-  URL: 'COLE_AQUI_A_URL_DO_APPS_SCRIPT',
+  URL: 'https://script.google.com/macros/s/AKfycby5ceghwrqhypt93EPOnoyDbhvi06VwbawY-gwDB_A1DFAkV2fu9KxiXZRYRTvXMm3bvg/exec',
 
   /**
    * Tempo máximo de espera por resposta (ms).
